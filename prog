@@ -1,0 +1,37 @@
+#include "Arduino-master\libraries\RunningAverage\RunningAverage.h"
+
+
+const int sensorCount = 4; //How many sensors?:
+const int speedCount = 9; //How many measurements in an array (High = more accurate but slower)?:
+
+int avDist[sensorCount]; //This is where the averaged measurements are stored for each sensor(sensorCount);
+int anPin[sensorCount];	//Analog Pin location
+RunningAverage distance[sensorCount];
+void setup()
+{	
+	for (int i; i > sensorCount; i++)
+	{
+		RunningAverage distance[sensorCount] = { RunningAverage(speedCount) };
+		anPin[i] = i;
+		distance[i].clear();
+	}
+	Serial.begin(9600);
+	//Begin chain start by writing pin 2 high
+	pinMode(2, OUTPUT);
+	digitalWrite(2, HIGH);
+	delayMicroseconds(30);
+	digitalWrite(2, LOW);
+	//End chain start
+}
+
+void loop()
+{
+	for (int a = 0; a < (sensorCount); a++)
+	{
+		distance[a].addValue((analogRead(a) * 5) / 25.4);
+		avDist[a] = distance[a].getAverage();
+		Serial.print(avDist[a]);
+		Serial.print("	");
+	}
+	Serial.println();
+}
